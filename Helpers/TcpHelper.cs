@@ -46,10 +46,9 @@ namespace ChatNet
                             client.GetStream().Read(buffer, 0, buffer.Length);
 
                             message = Encoding.ASCII.GetString(buffer);
+			    message = String.Concat(DateTime.Now.ToShortTimeString(), message);
                             Console.WriteLine(message);
 
-                            byte[] timestamp = Encoding.ASCII.GetBytes($" {DateTime.Now.ToShortTimeString()}\n");
-                            client.GetStream().Write(timestamp, 0, timestamp.Length);
                         }
                         Console.WriteLine("Closing connection.");
                         client.GetStream().Dispose();
