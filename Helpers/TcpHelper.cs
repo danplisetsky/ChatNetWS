@@ -39,7 +39,7 @@ namespace ChatNet
 
                         while (message != null && !message.StartsWith("quit"))
                         {
-                            byte[] data = Encoding.ASCII.GetBytes("Send next data: [enter 'quit' to terminate] ");
+                            byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
                             client.GetStream().Write(data, 0, data.Length);
 
                             byte[] buffer = new byte[1024];
@@ -47,6 +47,9 @@ namespace ChatNet
 
                             message = Encoding.ASCII.GetString(buffer);
                             Console.WriteLine(message);
+
+                            byte[] timestamp = Encoding.ASCII.GetBytes($" {DateTime.Now.ToShortTimeString()}\n");
+                            client.GetStream().Write(timestamp, 0, timestamp.Length);
                         }
                         Console.WriteLine("Closing connection.");
                         client.GetStream().Dispose();
