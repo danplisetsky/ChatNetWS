@@ -1,0 +1,6 @@
+1. server has a list of connected users
+2. user connects to a tcp/ip socket
+3. all messages are visible to each user
+4. application is executes as a CLI interface
+5. message log for each user is updated ASAP
+
