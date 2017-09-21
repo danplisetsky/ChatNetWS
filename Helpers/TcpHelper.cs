@@ -12,7 +12,7 @@ namespace ChatNet
 
         public static void StartServer(int port)
         {
-            IPAddress address = IPAddress.Parse("127.0.0.1");
+            IPAddress address = IPAddress.Parse("10.0.0.4");
             listener = new TcpListener(address, port);
 
             listener.Start();
