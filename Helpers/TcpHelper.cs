@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.IO;
 
 namespace ChatNet
 {
@@ -9,10 +10,13 @@ namespace ChatNet
     {
         private static TcpListener listener { get; set; }
         private static bool accept { get; set; } = false;
+        private const String _confPath = "ipconf";
 
         public static void StartServer(int port)
-        {
-            IPAddress address = IPAddress.Parse("10.0.0.4");
+        {   
+            
+            String IPString = File.ReadAllText(_confPath).Trim();             
+            IPAddress address = IPAddress.Parse(IPString);
             listener = new TcpListener(address, port);
 
             listener.Start();
