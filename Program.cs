@@ -9,9 +9,9 @@ namespace ChatNet
     {
         static void Main(string[] args)
         {
-            //TcpHelper.StartServer(7777);
-            //TcpHelper.Listen();
-            System.Console.WriteLine(IpHelper.GetLocalIp());
+            var ip = IpHelper.GetLocalIp();
+            TcpHelper.StartServer(ip, 7777);
+            TcpHelper.Listen();
         }
     }
 }
