@@ -12,7 +12,7 @@ namespace ChatNet
 
         public static void StartServer(int port)
         {
-            IPAddress address = IPAddress.Parse("127.0.0.1");
+            IPAddress address = IPAddress.Parse("10.0.0.4");
             listener = new TcpListener(address, port);
 
             listener.Start();
@@ -33,29 +33,23 @@ namespace ChatNet
 
                     if (clientTask.Result != null)
                     {
+                        Console.WriteLine("Client connected. Waiting for data.");
                         var client = clientTask.Result;
-                        try
+                        string message = "";
+
+                        while (message != null && !message.Contains("quit"))
                         {
-                            Console.WriteLine("Client connected. Waiting for data.");
-                            string message = "";
+                            byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
+                            client.GetStream().Write(data, 0, data.Length);
 
-                            while (message != null && !message.Contains("quit"))
-                            {
-                                byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
-                                client.GetStream().Write(data, 0, data.Length);
+                            byte[] buffer = new byte[1024];
+                            client.GetStream().Read(buffer, 0, buffer.Length);
 
-                                byte[] buffer = new byte[1024];
-                                client.GetStream().Read(buffer, 0, buffer.Length);
-
-                                message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";
-                                Console.WriteLine(message);
-                            }
-                            Console.WriteLine("Closing connection.");
+                            message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";                            
+                            Console.WriteLine(message);
                         }
-                        finally
-                        {
-                            client.GetStream().Dispose();
-                        }
+                        Console.WriteLine("Closing connection.");
+                        client.GetStream().Dispose();
                     }
                 }
             }
