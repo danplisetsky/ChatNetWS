@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace ChatNet
+namespace ChatNet.Helpers
 {
-    static class TcpHelper
+    public static class TcpHelper
     {
         private static TcpListener listener { get; set; }
         private static bool accept { get; set; } = false;
