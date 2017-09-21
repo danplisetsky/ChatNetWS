@@ -67,7 +67,7 @@ namespace ChatNet.Helpers
                            {        
                                while (message != null && !message.Contains("/quit"))
                                {
-                                   byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
+                                   byte[] data = Encoding.ASCII.GetBytes($"HipChat: ");
                                    client.GetStream().Write(data, 0, data.Length);
 
                                    byte[] buffer = new byte[1024];
@@ -75,11 +75,19 @@ namespace ChatNet.Helpers
 
                                    message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";
                                    Console.WriteLine(message);
+
+                                   clients.Where(other => user != other).ToList()
+                                    .ForEach(u =>
+                                    {
+                                        var nl = Encoding.ASCII.GetBytes(Environment.NewLine);
+                                        u.TcpClient.GetStream().Write(nl, 0, nl.Length);
+                                        u.TcpClient.GetStream().Write(buffer, 0, buffer.Length);
+                                    });
                                }
                            }
                            finally
                            {
-                               Console.WriteLine("Closing connection.");
+                               Console.WriteLine($"Closing connection with {user.EndPoint}");
                                client.GetStream().Dispose();
                                clients.Remove(user);                            
                            }
