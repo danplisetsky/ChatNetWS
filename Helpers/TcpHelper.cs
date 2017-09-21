@@ -28,29 +28,35 @@ namespace ChatNet.Helpers
                 // Continue listening.  
                 while (true)
                 {
-                    Console.WriteLine("Waiting for client...");
-                    var clientTask = listener.AcceptTcpClientAsync(); // Get the client  
 
-                    if (clientTask.Result != null)
+                    if (listener.Pending())
                     {
-                        Console.WriteLine("Client connected. Waiting for data.");
-                        var client = clientTask.Result;
-                        string message = "";
+                        TcpClient tcpClient = listener.AcceptTcpClient();
+                        Console.WriteLine($"I am connecting to " + 
+                            IPAddress.Parse(((IPEndPoint)listener.LocalEndpoint).Address.ToString()));
+                    } 
+                    // var clientTask = listener.AcceptTcpClientAsync(); // Get the client  
+     
+                    // if (clientTask.Result != null)
+                    // {
+                    //     Console.WriteLine("Client connected. Waiting for data.");
+                    //     var client = clientTask.Result;
+                    //     string message = "";
 
-                        while (message != null && !message.Contains("quit"))
-                        {
-                            byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
-                            client.GetStream().Write(data, 0, data.Length);
+                    //     while (message != null && !message.Contains("quit"))
+                    //     {
+                    //         byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
+                    //         client.GetStream().Write(data, 0, data.Length);
 
-                            byte[] buffer = new byte[1024];
-                            client.GetStream().Read(buffer, 0, buffer.Length);
+                    //         byte[] buffer = new byte[1024];
+                    //         client.GetStream().Read(buffer, 0, buffer.Length);
 
-                            message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";                            
-                            Console.WriteLine(message);
-                        }
-                        Console.WriteLine("Closing connection.");
-                        client.GetStream().Dispose();
-                    }
+                    //         message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";                            
+                    //         Console.WriteLine(message);
+                    //     }
+                    //     Console.WriteLine("Closing connection.");
+                    //     client.GetStream().Dispose();
+                    // }
                 }
             }
         }
