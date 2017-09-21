@@ -13,7 +13,7 @@ namespace ChatNet.Helpers
         private static TcpListener listener;
         private static bool accept = false;
 
-        private static Dictionary<EndPoint, TcpClient> clients = new Dictionary<EndPoint, TcpClient>();
+        private static List<User> clients = new List<User>();
 
         public static void StartServer(string ip, int port)
         {
@@ -35,12 +35,13 @@ namespace ChatNet.Helpers
                 {
                     var clientTask = listener.AcceptTcpClientAsync();
 
+
                     WorkWithClients();
 
                     if (clientTask.Result != null)
                     {
                         var client = clientTask.Result;
-                        clients.Add(client.Client.RemoteEndPoint, client);
+                        clients.Add(new User(client.Client.RemoteEndPoint, client));
                         System.Console.WriteLine($"Client {client.Client.RemoteEndPoint} connected");
                     }
                 }
@@ -49,19 +50,21 @@ namespace ChatNet.Helpers
 
         private static void WorkWithClients()
         {
-            clients.Keys.ToList().ForEach(async ep =>
+            clients.Where(user => !user.Listening).ToList().ForEach(async user =>
             {
-                await WaitForMessage(clients[ep]);
+                user.Listening = true;
+                await WaitForMessage(user);
             });
         }
 
-        async static Task WaitForMessage(TcpClient client)
+        async static Task WaitForMessage(User user)
         {
             string message = "";
             await Task.Run(() =>
                        {
+                           var client = user.TcpClient;
                            try
-                           {
+                           {        
                                while (message != null && !message.Contains("/quit"))
                                {
                                    byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
@@ -78,6 +81,7 @@ namespace ChatNet.Helpers
                            {
                                Console.WriteLine("Closing connection.");
                                client.GetStream().Dispose();
+                               clients.Remove(user);                            
                            }
                        });
         }
