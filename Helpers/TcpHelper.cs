@@ -37,7 +37,7 @@ namespace ChatNet
                         var client = clientTask.Result;
                         string message = "";
 
-                        while (message != null && !message.StartsWith("quit"))
+                        while (message != null && !message.Contains("quit"))
                         {
                             byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
                             client.GetStream().Write(data, 0, data.Length);
@@ -45,10 +45,8 @@ namespace ChatNet
                             byte[] buffer = new byte[1024];
                             client.GetStream().Read(buffer, 0, buffer.Length);
 
-                            message = Encoding.ASCII.GetString(buffer);
-			    message = String.Concat(DateTime.Now.ToShortTimeString(), message);
+                            message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";                            
                             Console.WriteLine(message);
-
                         }
                         Console.WriteLine("Closing connection.");
                         client.GetStream().Dispose();

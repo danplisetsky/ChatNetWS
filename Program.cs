@@ -8,7 +8,7 @@ namespace ChatNet
     {        
         static void Main(string[] args)
         {
-            TcpHelper.StartServer(8000);
+            TcpHelper.StartServer(7777);
             TcpHelper.Listen();
         }
     }
