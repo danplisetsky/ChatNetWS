@@ -30,11 +30,10 @@ namespace ChatNet.Helpers
         {
             if (listener != null && accept)
             {
-                // Continue listening.  
+                Console.WriteLine("Waiting for clients...");
                 while (true)
                 {
-                    Console.WriteLine("Waiting for client...");
-                    var clientTask = listener.AcceptTcpClientAsync(); // Get the client  
+                    var clientTask = listener.AcceptTcpClientAsync();
 
                     WorkWithClients();
 
@@ -42,34 +41,7 @@ namespace ChatNet.Helpers
                     {
                         var client = clientTask.Result;
                         clients.Add(client.Client.RemoteEndPoint, client);
-                        System.Console.WriteLine("You are connected");
-
-                        // Console.WriteLine("Closing connection.");
-                        // client.GetStream().Dispose();
-
-
-                        //System.Console.WriteLine(clientTask.Result);
-                        // //clientTask.Result.
-
-
-
-                        // Console.WriteLine("Client connected. Waiting for data.");
-                        // var client = clientTask.Result;
-                        // string message = "";
-
-                        // //while (message != null && !message.Contains("quit"))
-                        // {
-                        //     byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
-                        //     client.GetStream().Write(data, 0, data.Length);
-
-                        //     byte[] buffer = new byte[1024];
-                        //     client.GetStream().Read(buffer, 0, buffer.Length);
-
-                        //     message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";                            
-                        //     Console.WriteLine(message);
-                        // }
-                        //Console.WriteLine("Closing connection.");
-                        //client.GetStream().Dispose();
+                        System.Console.WriteLine($"Client {client.Client.RemoteEndPoint} connected");
                     }
                 }
             }
@@ -88,19 +60,25 @@ namespace ChatNet.Helpers
             string message = "";
             await Task.Run(() =>
                        {
-                           while (message != null && !message.Contains("quit"))
+                           try
                            {
-                               byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
-                               client.GetStream().Write(data, 0, data.Length);
+                               while (message != null && !message.Contains("/quit"))
+                               {
+                                   byte[] data = Encoding.ASCII.GetBytes($"Chat: ");
+                                   client.GetStream().Write(data, 0, data.Length);
 
-                               byte[] buffer = new byte[1024];
-                               client.GetStream().Read(buffer, 0, buffer.Length);
+                                   byte[] buffer = new byte[1024];
+                                   client.GetStream().Read(buffer, 0, buffer.Length);
 
-                               message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";
-                               Console.WriteLine(message);
+                                   message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";
+                                   Console.WriteLine(message);
+                               }
                            }
-                           Console.WriteLine("Closing connection.");
-                           client.GetStream().Dispose();
+                           finally
+                           {
+                               Console.WriteLine("Closing connection.");
+                               client.GetStream().Dispose();
+                           }
                        });
         }
     }
