@@ -35,7 +35,6 @@ namespace ChatNet.Helpers
                 {
                     var clientTask = listener.AcceptTcpClientAsync();
 
-
                     WorkWithClients();
 
                     if (clientTask.Result != null)
@@ -67,13 +66,15 @@ namespace ChatNet.Helpers
                            {        
                                while (message != null && !message.Contains("/quit"))
                                {
-                                   byte[] data = Encoding.ASCII.GetBytes($"HipChat: ");
-                                   client.GetStream().Write(data, 0, data.Length);
+                                //    byte[] data = Encoding.ASCII.GetBytes($"HipChat: ");
+                                //    client.GetStream().Write(data, 0, data.Length);
 
-                                   byte[] buffer = new byte[1024];
-                                   client.GetStream().Read(buffer, 0, buffer.Length);
+                                   byte[] msg_buffer = new byte[1024];
+                                   client.GetStream().Read(msg_buffer, 0, msg_buffer.Length);
 
-                                   message = $"{DateTime.Now.ToShortTimeString()} {Encoding.ASCII.GetString(buffer)}";
+                                   message = DateTime.Now.ToShortTimeString() + ' ' +  
+                                             Encoding.ASCII.GetString(msg_buffer);
+                                   
                                    Console.WriteLine(message);
 
                                    clients.Where(other => user != other).ToList()
@@ -81,7 +82,7 @@ namespace ChatNet.Helpers
                                     {
                                         var nl = Encoding.ASCII.GetBytes(Environment.NewLine);
                                         u.TcpClient.GetStream().Write(nl, 0, nl.Length);
-                                        u.TcpClient.GetStream().Write(buffer, 0, buffer.Length);
+                                        u.TcpClient.GetStream().Write(msg_buffer, 0, msg_buffer.Length);
                                     });
                                }
                            }
