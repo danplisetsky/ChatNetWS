@@ -2,7 +2,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace ChatNet.Helpers
+namespace ChatNetWS.Helpers
 {
     public static class IpHelper
     {

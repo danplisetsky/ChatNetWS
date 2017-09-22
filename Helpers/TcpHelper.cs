@@ -6,7 +6,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatNet.Helpers
+using ChatNetWS.Models;
+
+namespace ChatNetWS.Helpers
 {
     public static class TcpHelper
     {
@@ -36,13 +38,33 @@ namespace ChatNet.Helpers
                     var clientTask = listener.AcceptTcpClientAsync();
 
 
-                    WorkWithClients();
+                    //WorkWithClients();
 
                     if (clientTask.Result != null)
                     {
                         var client = clientTask.Result;
                         clients.Add(new User(client.Client.RemoteEndPoint, client));
                         System.Console.WriteLine($"Client {client.Client.RemoteEndPoint} connected");
+
+                        var stream = client.GetStream();
+
+                        var requestList = new List<byte>();
+
+                        //wait until there is data in the stream
+                        while (!stream.DataAvailable) { }
+
+                        //read everything in the stream
+                        while (stream.DataAvailable)
+                        {
+                            requestList.Add((byte)stream.ReadByte());
+                        }
+                        //send response
+                        System.Console.WriteLine(Encoding.UTF8.GetString(requestList.ToArray()));
+                        byte[] response = HandshakeHelper.GenerateResponse(requestList.ToArray());
+                        stream.Write(response, 0, response.Length);
+
+                        System.Console.WriteLine("Response:");
+                        System.Console.WriteLine(Encoding.UTF8.GetString(response.ToArray()));
                     }
                 }
             }
@@ -64,11 +86,11 @@ namespace ChatNet.Helpers
                        {
                            var client = user.TcpClient;
                            try
-                           {        
+                           {
                                while (message != null && !message.Contains("/quit"))
                                {
-                                   byte[] data = Encoding.ASCII.GetBytes($"HipChat: ");
-                                   client.GetStream().Write(data, 0, data.Length);
+                                   //byte[] data = Encoding.ASCII.GetBytes($"HipChat: ");
+                                   //client.GetStream().Write(data, 0, data.Length);
 
                                    byte[] buffer = new byte[1024];
                                    client.GetStream().Read(buffer, 0, buffer.Length);
@@ -89,7 +111,7 @@ namespace ChatNet.Helpers
                            {
                                Console.WriteLine($"Closing connection with {user.EndPoint}");
                                client.GetStream().Dispose();
-                               clients.Remove(user);                            
+                               clients.Remove(user);
                            }
                        });
         }

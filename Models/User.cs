@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace ChatNet
+namespace ChatNetWS.Models
 {
     public class User
     {
